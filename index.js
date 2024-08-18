@@ -1,13 +1,10 @@
-const express = require('express');
-const app = express();
-const port = 3000;
+// functions/price.js
 
-// Function to generate random price change
-function getRandomPriceChange(price) {
+const getRandomPriceChange = (price) => {
   const maxChange = price * 0.6;
-  const change = (Math.random() - 0.5) * 2 * maxChange; // Random change between -maxChange and +maxChange
+  const change = (Math.random() - 0.5) * 2 * maxChange;
   return price + change;
-}
+};
 
 // Store prices for the last 5 hours
 let prices = [];
@@ -28,15 +25,14 @@ setInterval(() => {
   }
 }, 3600000); // 1 hour in milliseconds
 
-// API endpoint to get current price and prices from the last 5 hours
-app.get('/price', (req, res) => {
+exports.handler = async (event, context) => {
   const currentPrice = prices[prices.length - 1];
-  res.json({
-    currentPrice,
-    last5Hours: prices.slice(0, -1) // Exclude current price from the last 5 hours
-  });
-});
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      currentPrice,
+      last5Hours: prices, // Include the current price in the last 5 hours
+    }),
+  };
+};
 
-app.listen(port, () => {
-  console.log(`Price tracker API listening at http://localhost:${port}`);
-});
